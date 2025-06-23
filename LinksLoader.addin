@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<RevitAddIns>
+	<AddIn Type="Command">
+		<Name>Links Loader</Name>
+		<Assembly>LinksLoader.dll</Assembly>
+		<AddInId>CB6F14B5-C0A9-4F08-9C5C-EFBCFD1535BA</AddInId>
+		<FullClassName>LinksLoader.LinksLoaderCommand</FullClassName>
+		<VendorId>YOURID</VendorId>
+		<VendorDescription>Test</VendorDescription>
+	</AddIn>
+</RevitAddIns>
