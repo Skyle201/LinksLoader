@@ -24,6 +24,7 @@ namespace LinksLoader.Models
                     placement_Shared = ImportPlacement.Shared;
                     var placement_Origin = new ImportPlacement();
                     placement_Origin = ImportPlacement.Origin;
+                    var sharedSucess = false;
                     using (Transaction tx = new Transaction(doc, "Загрузка связей"))
                     {
                         tx.Start();
@@ -31,6 +32,7 @@ namespace LinksLoader.Models
                         {
                             var rl_type = RevitLinkType.Create(doc, mp, rlo);
                             var rl_inst = RevitLinkInstance.Create(doc, rl_type.ElementId, placement_Shared);
+                            sharedSucess = true;
                             tx.Commit();
                         }
                         catch (Exception ex)
@@ -38,12 +40,15 @@ namespace LinksLoader.Models
                             tx.RollBack();
                         }
                     }
-                    using (Transaction tx = new Transaction(doc, "Загрузка связей"))
+                    if (!sharedSucess)
                     {
-                        tx.Start();
-                        var rl_type = RevitLinkType.Create(doc, mp, rlo);
-                        var rl_inst = RevitLinkInstance.Create(doc, rl_type.ElementId, placement_Origin);
-                        tx.Commit();
+                        using (Transaction tx = new Transaction(doc, "Загрузка связей"))
+                        {
+                            tx.Start();
+                            var rl_type = RevitLinkType.Create(doc, mp, rlo);
+                            var rl_inst = RevitLinkInstance.Create(doc, rl_type.ElementId, placement_Origin);
+                            tx.Commit();
+                        }
                     }
                 }
                 return Result.Succeeded;

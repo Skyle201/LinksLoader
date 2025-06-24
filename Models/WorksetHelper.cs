@@ -135,13 +135,13 @@ namespace LinksLoader.Models
                 return worksetByName["#Связи КР"];
             if (name.Contains("_км") || name.Contains("_km"))
                 return worksetByName["#Связи КМ"];
-            if (name.Contains("_вк") || name.Contains("_vk") || name.Contains("_сс") || name.Contains("_аупт"))
+            if (name.Contains("_вк") || name.Contains("_vk") || name.Contains("_аупт"))
                 return worksetByName["#Связи ВКиАУПТ"];
             if (name.Contains("_ов") || name.Contains("_ov") || name.Contains("_хс"))
                 return worksetByName["#Связи ОВ"];
             if (name.Contains("_тх") || name.Contains("_th"))
                 return worksetByName["#Связи ТХ"];
-            if (name.Contains("_es") || name.Contains("_эс"))
+            if (name.Contains("_es") || name.Contains("_эс") || name.Contains("_сс"))
                 return worksetByName["#Связи ЭОМиСС"];
             return null;
         }

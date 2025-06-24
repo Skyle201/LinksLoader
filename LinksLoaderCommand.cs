@@ -25,7 +25,6 @@ namespace LinksLoader
                 DataContext = windowViewModel
             };
             var worksetHelper = new WorksetHelper(doc);
-            
             bool? result = window.ShowDialog();
             if (result == true)
             {
@@ -36,7 +35,7 @@ namespace LinksLoader
                 }
             }
 
-            if (windowViewModel.DisableWorksets) {worksetHelper.TurnOffWorksets();}
+            if (windowViewModel.DisableWorksets) { worksetHelper.TurnOffWorksets(); }
             if (windowViewModel.MoveLinksToWorksets) { worksetHelper.CreateAndMoveWorksets(); }
             return Result.Succeeded;
         }
