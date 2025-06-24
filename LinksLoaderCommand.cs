@@ -18,25 +18,26 @@ namespace LinksLoader
         {
             UIDocument uidoc = commandData.Application.ActiveUIDocument;
             Document doc = uidoc.Document;
-            LinkHelper helper = new LinkHelper(doc);
-
-            var viewModel = new TreeViewModel();
+            LinkHelper linkHelper = new LinkHelper(doc);
+            var windowViewModel = new WindowViewModel();
             var window = new LoaderView()
             {
-                DataContext = viewModel
+                DataContext = windowViewModel
             };
-
+            var worksetHelper = new WorksetHelper(doc);
+            
             bool? result = window.ShowDialog();
             if (result == true)
             {
-                List<string> selectedPaths = viewModel.GetCheckedPaths();
-                TaskDialog.Show("Список выбранных файлов", string.Join(Environment.NewLine, selectedPaths));
+                List<string> selectedPaths = windowViewModel.treeViewModel.GetCheckedPaths();
                 if (selectedPaths != null && selectedPaths.Count > 0)
                 {
-                    helper.LoadLinks(selectedPaths);
+                    linkHelper.LoadLinks(selectedPaths);
                 }
             }
 
+            if (windowViewModel.DisableWorksets) {worksetHelper.TurnOffWorksets();}
+            if (windowViewModel.MoveLinksToWorksets) { worksetHelper.CreateAndMoveWorksets(); }
             return Result.Succeeded;
         }
     }

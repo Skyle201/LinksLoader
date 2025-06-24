@@ -57,16 +57,18 @@
     <Compile Include="LinksLoaderCommand.cs" />
     <Compile Include="Models\FileCollector.cs" />
     <Compile Include="Models\LinkHelper.cs" />
+    <Compile Include="Models\WorksetHelper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="LoaderView.xaml.cs">
+    <Compile Include="Views\LoaderView.xaml.cs">
       <DependentUpon>LoaderView.xaml</DependentUpon>
     </Compile>
     <Compile Include="ViewModels\RelayCommand.cs" />
     <Compile Include="ViewModels\TreeViewModel.cs" />
     <Compile Include="ViewModels\ViewModelBase.cs" />
+    <Compile Include="ViewModels\WindowViewModel.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Page Include="LoaderView.xaml">
+    <Page Include="Views\LoaderView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -74,8 +76,6 @@
   <ItemGroup>
     <None Include="LinksLoader.addin" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Views\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
