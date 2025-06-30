@@ -63,23 +63,26 @@ namespace LinksLoader.Models
         public void CreateAndMoveWorksets()
         {
             List<string> requiredWorksetNames = new List<string>
-                {
-                    "#DWG",
-                    "#Связи АР",
-                    "#Связи ВКиАУПТ",
-                    "#Связи КМ",
-                    "#Связи КР",
-                    "#Связи ОВ",
-                    "#Связи ТХ",
-                    "#Связи ЭОМиСС",
-                    "#Связи РФ"
-            };
+    {
+        "#DWG",
+        "#Связи АР",
+        "#Связи ВКиАУПТ",
+        "#Связи КМ",
+        "#Связи КР",
+        "#Связи ОВ",
+        "#Связи ТХ",
+        "#Связи ЭОМиСС",
+        "#Связи РФ"
+    };
+
             WorksetTable worksetTable = doc.GetWorksetTable();
             ICollection<Workset> existingWorksets = new FilteredWorksetCollector(doc)
                 .OfKind(WorksetKind.UserWorkset)
                 .ToWorksets();
 
-            Dictionary<string, Workset> worksetByName = existingWorksets.ToDictionary(w => w.Name, w => w);
+            Dictionary<string, Workset> worksetByName = existingWorksets
+                .GroupBy(w => w.Name)
+                .ToDictionary(g => g.Key, g => g.First());
 
             using (Transaction tx = new Transaction(doc, "Создание рабочих наборов и перемещение связей"))
             {
@@ -100,24 +103,35 @@ namespace LinksLoader.Models
 
                 foreach (var linkInstance in linkInstances)
                 {
-                    string pathOrName = linkInstance.Name.ToLower();
+                    string linkName = linkInstance.Name.ToLower();
+                    string originalName = linkInstance.GetLinkDocument().Title;
 
-                    Workset targetWorkset = GetTargetWorkset(pathOrName, worksetByName);
-                    if (targetWorkset != null)
+                    Workset targetWorkset = GetTargetWorkset(linkName, worksetByName);
+                    if (targetWorkset == null)
                     {
-                        Parameter param = linkInstance.get_Parameter(BuiltInParameter.ELEM_PARTITION_PARAM);
-                        if (param != null && !param.IsReadOnly)
+                        string dynamicName = $"#Связь {originalName}";
+                        if (!worksetByName.ContainsKey(dynamicName))
                         {
-                            param.Set(targetWorkset.Id.IntegerValue);
+                            Workset newDynamicWs = Workset.Create(doc, dynamicName);
+                            worksetByName[dynamicName] = newDynamicWs;
                         }
-                        RevitLinkType linkType = doc.GetElement(linkInstance.GetTypeId()) as RevitLinkType;
-                        if (linkType != null)
+
+                        targetWorkset = worksetByName[dynamicName];
+                    }
+
+                    Parameter param = linkInstance.get_Parameter(BuiltInParameter.ELEM_PARTITION_PARAM);
+                    if (param != null && !param.IsReadOnly)
+                    {
+                        param.Set(targetWorkset.Id.IntegerValue);
+                    }
+
+                    RevitLinkType linkType = doc.GetElement(linkInstance.GetTypeId()) as RevitLinkType;
+                    if (linkType != null)
+                    {
+                        Parameter typeParam = linkType.get_Parameter(BuiltInParameter.ELEM_PARTITION_PARAM);
+                        if (typeParam != null && !typeParam.IsReadOnly)
                         {
-                            Parameter typeParam = linkType.get_Parameter(BuiltInParameter.ELEM_PARTITION_PARAM);
-                            if (typeParam != null && !typeParam.IsReadOnly)
-                            {
-                                typeParam.Set(targetWorkset.Id.IntegerValue);
-                            }
+                            typeParam.Set(targetWorkset.Id.IntegerValue);
                         }
                     }
                 }
@@ -125,6 +139,7 @@ namespace LinksLoader.Models
                 tx.Commit();
             }
         }
+
         private Workset GetTargetWorkset(string name, Dictionary<string, Workset> worksetByName)
         {
             if (name.Contains("_бф") || name.Contains("_рф"))
